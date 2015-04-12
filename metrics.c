@@ -14,9 +14,13 @@ struct Interp
 } interp;
 
 
-int main (int argc, char *argv[]){
-    char file_in_name[512], file_out_name[512];
-    char in_line[512];
+int main (int argc, char *argv[])
+{
+	if (argc < 2) {
+		printf("usage: %s <infile>\n", argv[0]);
+		return EXIT_FAILURE;
+	}
+
     int line_count, line, fits_line;
     double mag[line_max][2], synth_mag[line_max][2]; // day mag
     double magleg, mag_max, mag_min, mag_diff;
@@ -25,11 +29,13 @@ int main (int argc, char *argv[]){
 
 
     fftw_plan plan;
-    double f_in[1000], f_out[1000];
+
+	double *f_in = calloc(1000, sizeof(double));
+	double *f_out = calloc(1000, sizeof(double));
+
     // planning fourier transform
-    plan = fftw_plan_dft_r2hc_1d(1000, in, out, -1, FFTW_ESTIMATE);
 
-
+    plan = fftw_plan_r2r_1d(1000, f_in, f_out, FFTW_R2HC, FFTW_ESTIMATE);
 
     // null initialization
     for(line=0;line<line_max;line++){
@@ -42,29 +48,23 @@ int main (int argc, char *argv[]){
         mag[line][1]=0;
         synth_mag[line][0]=0;
         synth_mag[line][1]=0;
-        f_in[line];
-        f_out[line];
+        f_in[line] = 0;
+        f_out[line] = 0;
     }
 
-    FILE *file_in, *file_out;
-    strcpy(file_in_name,argv[1]);
-    strcpy(file_out_name,argv[2]);
-    file_in = fopen(file_in_name, "r");
-    file_out = fopen(file_out_name, "w");
+    FILE *file_in = fopen(argv[1], "r");
 
     magleg = 0;
 
     for(line=0; line < line_max; line++){
-        fgets(in_line, 512, file_in);
-
-        sscanf(in_line, "%lf %lf\n", &mag[line][0], &mag[line][1]);
+        fscanf(file_in, "%lf %lf\n", &mag[line][0], &mag[line][1]);
         if(magleg == mag[line][1]){
             line_count = line+1;
-            line = line_max;
+			break;
         }
         magleg = mag[line][0];
 
-        if(line<999){
+        if(line<line_max-1){
             fits[line].x1 = mag[line][0];
             fits[line].x2 = mag[line+1][0];
             fits[line].y1 = mag[line][1];
@@ -87,10 +87,12 @@ int main (int argc, char *argv[]){
                 synth_mag[line][1] = fits[fits_line].m * synth_mag[line][0] + fits[fits_line].c;
             }
         }
+		f_in[line] = synth_mag[line][1];
+		printf("%lf:", f_in[line]);
     }
 
 
-    execute(plan);
+    fftw_execute(plan);
 
 
     mag_max = 0;
@@ -106,9 +108,7 @@ int main (int argc, char *argv[]){
 
     mag_diff = mag_max-mag_min;
 
-    fprintf(file_out, "%f %f %f", mag_max, mag_min, mag_diff);
-
-
+    printf("%f %f %f\n", mag_max, mag_min, mag_diff);
 
     return 0;
 }
