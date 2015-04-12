@@ -4,6 +4,8 @@
 #include <fftw3.h>
 
 #define LINE_MAX 1000
+#define CUT_FREQ 100
+#define PEAK_NUM 5
 
 // linear interpolation between real data points
 struct Interp
@@ -27,6 +29,8 @@ int main (int argc, char *argv[])
     struct Interp *fits = calloc(LINE_MAX, sizeof(struct Interp));
     double *f_in = calloc(LINE_MAX, sizeof(double));
     double *f_out = calloc(LINE_MAX, sizeof(double));
+    double fpeak[PEAK_NUM+1][2] // first 5 fourier peaks from high to low apm in format: freq amp 
+    
 
     // planning fourier transform
 
@@ -85,7 +89,7 @@ int main (int argc, char *argv[])
 
     mag_max = 0;
     mag_min = 100;
-    for (line = 0; line < LINE_MAX; line++){
+    for (line = 0; line < line_count; line++){
         if(mag[line][0]>mag_max){
             mag_max = mag[line][0];
         }
@@ -96,6 +100,31 @@ int main (int argc, char *argv[])
         printf("%lf\n", f_out[line]);
     }
 
+    // initializing fourier peak initialization
+    for(peak = 1; peak < PEAK_NUM+1; peak++){
+        fpeak[peak][0] = 0;
+        fpeak[peak][1] = 0;
+    }
+    fpeak[0][1] = 1000;
+
+    for(peak = 1; peak < PEAK_NUM; line++){
+        for(line = 0; line < CUT_FREQ; line++){
+            if((f_out[line]>fpeak[peak])
+            &&(f_out[line]>=f_out[line-1])
+            &&(f_out[line]>=f_out[line+1])
+            &&(f_out[line]<fpeak[peak-1][1])){
+            fpeak[peak][0] = line*time_spacing;
+            fpeak[peak][1] = f_out[line];
+            }
+        }
+    }
+    
+    for(peak = 1; peak < PEAK_NUM+1; peak++){
+        printf("Peak %i has frequency %lf and amplitude %lf\n", peak, fpeak[peak][0], fpeak[peak][1]);
+    }
+    
+    
+    
     mag_diff = mag_max-mag_min;
 
     //printf("%f %f %f\n", mag_max, mag_min, mag_diff);
