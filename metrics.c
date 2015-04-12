@@ -30,6 +30,7 @@ int main (int argc, char *argv[])
     double *f_in = calloc(LINE_MAX, sizeof(double));
     double *f_out = calloc(LINE_MAX, sizeof(double));
     double fpeak[PEAK_NUM+1][2]; // first 5 fourier peaks from high to low apm in format: freq amp 
+    double mag_mean, max_mean, min_mean, mag_sum;
     
 
     // planning fourier transform
@@ -126,9 +127,21 @@ int main (int argc, char *argv[])
         printf("Peak %i has frequency %lf and amplitude %lf\n", peak, fpeak[peak][0], fpeak[peak][1]);
     }
     
-    
-    
+    mag_sum = 0;
     mag_diff = mag_max-mag_min;
+    for(line = 0; line < line_count; line++){
+        mag_sum = mag_sum + mag[line][1];
+    }
+    mag_mean = mag_sum/(line_count+1);
+    max_mean = mag_max-mag_mean;
+    min_mean = mag_mean-mag_min;
+    
+    //MAGMEAN MAGMIN MAGMAX MAGDIFF MAXMEAN MINMEAN F1 F2 F3 F4 F5 A1 A2 A3 A4 A5
+    printf("lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+    mag_mean, mag_min, mag_max, mag_diff, max_mean, min_mean, fpeak[1][0], fpeak[2][0],
+    fpeak[3][0], fpeak[4][0], fpeak[5][0], fpeak[1][1], fpeak[2][1], fpeak[3][1],
+    fpeak[4][1], fpeak[5][1]);
+    
 
     //printf("%f %f %f\n", mag_max, mag_min, mag_diff);
 
