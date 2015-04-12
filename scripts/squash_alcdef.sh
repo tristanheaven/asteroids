@@ -2,7 +2,7 @@
 
 dir=ALCDEF_ALL
 
-dos2unix "${dir}"/*.txt > /dev/null
+dos2unix -q "${dir}"/*.txt
 
 exec sed -i \
 	-e '/^\(ENDDATA\|DATA=\)/!d' \
