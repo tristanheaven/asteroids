@@ -155,7 +155,7 @@ int main (int argc, char *argv[])
     fminmean = fmean - f_min;
     
     //MAGMEAN MAGMIN MAGMAX MAGDIFF MAXMEAN MINMEAN 
-    printf("lf %lf %lf %lf %lf %lf",mag_mean, mag_min, mag_max, mag_diff, max_mean, min_mean);
+    printf("%lf %lf %lf %lf %lf %lf",mag_mean, mag_min, mag_max, mag_diff, max_mean, min_mean);
     //F1 F2 F3 F4 F5 
     printf("%lf %lf %lf %lf %lf", fpeak[1][0], fpeak[2][0], fpeak[3][0], fpeak[4][0], fpeak[5][0]);
     //A1 A2 A3 A4 A5
