@@ -68,7 +68,7 @@ int main (int argc, char *argv[])
 
 
     // setting even spacing of synthetic data
-    time_spacing = (mag[line_count -2][0] - mag[0][0]) / (line_count + 1);
+    time_spacing = (mag[line_count - 1][0] - mag[0][0]) / (line_count + 1);
     for (line = 0; line < line_count; line++) {
         synth_mag[line][0] = mag[0][0] + line * time_spacing;
     }
@@ -87,7 +87,7 @@ int main (int argc, char *argv[])
 
     fftw_execute(plan);
 
-    mag_max = 0;
+    mag_max = -100;
     mag_min = 100;
     for (line = 0; line < line_count; line++){
         if(mag[line][0]>mag_max){
