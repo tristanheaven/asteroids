@@ -1,0 +1,3 @@
+[submodule "neural2d"]
+	path = neural2d
+	url = https://github.com/davidrmiller/neural2d.git
