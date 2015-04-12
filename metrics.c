@@ -31,6 +31,7 @@ int main (int argc, char *argv[])
     double *f_out = calloc(LINE_MAX, sizeof(double));
     double fpeak[PEAK_NUM+2][2]; // first 5 fourier peaks from high to low apm in format: freq amp 
     double mag_mean, max_mean, min_mean, mag_sum;
+    double fsum, fmean, f_min, f_max fmaxmean, fminmean;
     
 
     // planning fourier transform
@@ -90,18 +91,7 @@ int main (int argc, char *argv[])
 
     fftw_execute(plan);
 
-    mag_max = -100;
-    mag_min = 100;
-    for (line = 0; line < line_count; line++){
-        if(mag[line][0]>mag_max){
-            mag_max = mag[line][0];
-        }
-        if(mag[line][0]<mag_min){
-            mag_min = mag[line][0];
-        }
 
-        printf("%lf %lf\n", f_out[line], line * time_spacing);
-    }
 
     // initializing fourier peak initialization
     for(int peak = 1; peak < PEAK_NUM+1; peak++){
@@ -127,24 +117,52 @@ int main (int argc, char *argv[])
         printf("Peak %i has frequency %lf and amplitude %lf\n", peak, fpeak[peak][0], fpeak[peak][1]);
     }
     
+    
+    
+    mag_max = -100;
+    f_max = -10000
+    mag_min = 100;
+    f_min = 10000
+    for (line = 0; line < line_count; line++){
+        if(f_out[line][1]>f_max){
+            f_max = f_out[line][1];
+        }
+        if(f_out[line][1]<f_min){
+            f_min = f_out[line][1];
+        }
+        
+        if(mag[line][0]>mag_max){
+            mag_max = mag[line][0];
+        }
+        if(mag[line][0]<mag_min){
+            mag_min = mag[line][0];
+        }
+    }
+    
     mag_sum = 0;
+    fsum = 0;
     mag_diff = mag_max-mag_min;
     for(line = 0; line < line_count; line++){
         mag_sum = mag_sum + mag[line][1];
+        fsum = fsum + f_out[line][1];
     }
-    mag_mean = mag_sum/(line_count+1);
-    max_mean = mag_max-mag_mean;
-    min_mean = mag_mean-mag_min;
+    mag_mean = mag_sum / (line_count + 1);
+    max_mean = mag_max - mag_mean;
+    min_mean = mag_mean - mag_min;
     
-    //MAGMEAN MAGMIN MAGMAX MAGDIFF MAXMEAN MINMEAN F1 F2 F3 F4 F5 A1 A2 A3 A4 A5
-    printf("lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-    mag_mean, mag_min, mag_max, mag_diff, max_mean, min_mean, fpeak[1][0], fpeak[2][0],
-    fpeak[3][0], fpeak[4][0], fpeak[5][0], fpeak[1][1], fpeak[2][1], fpeak[3][1],
-    fpeak[4][1], fpeak[5][1]);
+    fmean = fsum / (line_count + 1);
+    fmaxmean = f_max - fmean;
+    fminmean = fmean - f_min;
     
-
-    //printf("%f %f %f\n", mag_max, mag_min, mag_diff);
-
+    //MAGMEAN MAGMIN MAGMAX MAGDIFF MAXMEAN MINMEAN 
+    printf("lf %lf %lf %lf %lf %lf",mag_mean, mag_min, mag_max, mag_diff, max_mean, min_mean);
+    //F1 F2 F3 F4 F5 
+    printf("%lf %lf %lf %lf %lf", fpeak[1][0], fpeak[2][0], fpeak[3][0], fpeak[4][0], fpeak[5][0]);
+    //A1 A2 A3 A4 A5
+    printf("%lf %lf %lf %lf %lf", fpeak[1][1], fpeak[2][1], fpeak[3][1], fpeak[4][1], fpeak[5][1]);
+    //FSUM FMEAN FMIN FMAX FMAXMEAN FMINMEAN
+    printf("%lf %lf %lf %lf %lf %lf", fsum, fmean, f_min, f_max, fmaxmean, fminmean);
+    
     return 0;
 }
 
