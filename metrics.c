@@ -21,7 +21,7 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    int line_count, line, fits_line;
+    int line_count = 0, line, fits_line;
     double mag[LINE_MAX][2], synth_mag[LINE_MAX][2]; // day mag
     double magleg, mag_max, mag_min, mag_diff;
     double time_spacing;
@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
     double *f_out = calloc(LINE_MAX, sizeof(double));
     double fpeak[PEAK_NUM+2][2]; // first 5 fourier peaks from high to low apm in format: freq amp 
     double mag_mean, max_mean, min_mean, mag_sum;
-    double fsum, fmean, f_min, f_max fmaxmean, fminmean;
+    double fsum, fmean, f_min, f_max, fmaxmean, fminmean;
     
 
     // planning fourier transform
@@ -53,7 +53,6 @@ int main (int argc, char *argv[])
     for(line=0; line < LINE_MAX; line++){
         fscanf(file_in, "%lf %lf\n", &mag[line][0], &mag[line][1]);
         if(magleg == mag[line][1]){
-            line_count = line - 1;
         //    printf("%d\n", line_count);
            // return 0;
             break;
@@ -69,6 +68,8 @@ int main (int argc, char *argv[])
             fits[line].c = fits[line].y1-fits[line].m*fits[line].x1;
         }
     }
+
+    line_count = line - 1;
 
 
     // setting even spacing of synthetic data
@@ -120,15 +121,15 @@ int main (int argc, char *argv[])
     
     
     mag_max = -100;
-    f_max = -10000
+    f_max = -10000;
     mag_min = 100;
-    f_min = 10000
+    f_min = 10000;
     for (line = 0; line < line_count; line++){
-        if(f_out[line][1]>f_max){
-            f_max = f_out[line][1];
+        if(f_out[line]>f_max){
+            f_max = f_out[line];
         }
-        if(f_out[line][1]<f_min){
-            f_min = f_out[line][1];
+        if(f_out[line]<f_min){
+            f_min = f_out[line];
         }
         
         if(mag[line][0]>mag_max){
@@ -144,7 +145,7 @@ int main (int argc, char *argv[])
     mag_diff = mag_max-mag_min;
     for(line = 0; line < line_count; line++){
         mag_sum = mag_sum + mag[line][1];
-        fsum = fsum + f_out[line][1];
+        fsum = fsum + f_out[line];
     }
     mag_mean = mag_sum / (line_count + 1);
     max_mean = mag_max - mag_mean;
@@ -162,6 +163,8 @@ int main (int argc, char *argv[])
     printf("%lf %lf %lf %lf %lf", fpeak[1][1], fpeak[2][1], fpeak[3][1], fpeak[4][1], fpeak[5][1]);
     //FSUM FMEAN FMIN FMAX FMAXMEAN FMINMEAN
     printf("%lf %lf %lf %lf %lf %lf", fsum, fmean, f_min, f_max, fmaxmean, fminmean);
+    // \n
+    puts("");
     
     return 0;
 }
