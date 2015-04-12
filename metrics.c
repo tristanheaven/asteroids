@@ -29,7 +29,7 @@ int main (int argc, char *argv[])
     struct Interp *fits = calloc(LINE_MAX, sizeof(struct Interp));
     double *f_in = calloc(LINE_MAX, sizeof(double));
     double *f_out = calloc(LINE_MAX, sizeof(double));
-    double fpeak[PEAK_NUM+1][2]; // first 5 fourier peaks from high to low apm in format: freq amp 
+    double fpeak[PEAK_NUM+2][2]; // first 5 fourier peaks from high to low apm in format: freq amp 
     double mag_mean, max_mean, min_mean, mag_sum;
     
 
