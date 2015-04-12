@@ -4,7 +4,7 @@
 #include <fftw3.h>
 
 #define LINE_MAX 1000
-#define CUT_FREQ 100
+#define CUT_FREQ 30
 #define PEAK_NUM 5
 
 // linear interpolation between real data points
@@ -29,7 +29,7 @@ int main (int argc, char *argv[])
     struct Interp *fits = calloc(LINE_MAX, sizeof(struct Interp));
     double *f_in = calloc(LINE_MAX, sizeof(double));
     double *f_out = calloc(LINE_MAX, sizeof(double));
-    double fpeak[PEAK_NUM+1][2] // first 5 fourier peaks from high to low apm in format: freq amp 
+    double fpeak[PEAK_NUM+1][2]; // first 5 fourier peaks from high to low apm in format: freq amp 
     
 
     // planning fourier transform
@@ -52,6 +52,8 @@ int main (int argc, char *argv[])
         fscanf(file_in, "%lf %lf\n", &mag[line][0], &mag[line][1]);
         if(magleg == mag[line][1]){
             line_count = line - 1;
+        //    printf("%d\n", line_count);
+           // return 0;
             break;
         }
         magleg = mag[line][0];
@@ -97,29 +99,30 @@ int main (int argc, char *argv[])
             mag_min = mag[line][0];
         }
 
-        printf("%lf\n", f_out[line]);
+        printf("%lf %lf\n", f_out[line], line * time_spacing);
     }
 
     // initializing fourier peak initialization
-    for(peak = 1; peak < PEAK_NUM+1; peak++){
+    for(int peak = 1; peak < PEAK_NUM+1; peak++){
         fpeak[peak][0] = 0;
         fpeak[peak][1] = 0;
     }
+    fpeak[0][0] = 1000;
     fpeak[0][1] = 1000;
 
-    for(peak = 1; peak < PEAK_NUM; line++){
-        for(line = 0; line < CUT_FREQ; line++){
-            if((f_out[line]>fpeak[peak])
+    for(int peak = 1; peak < PEAK_NUM; peak++){
+        for(line = 1; line < CUT_FREQ; line++){
+            if((f_out[line]>fpeak[peak][1])
             &&(f_out[line]>=f_out[line-1])
             &&(f_out[line]>=f_out[line+1])
             &&(f_out[line]<fpeak[peak-1][1])){
-            fpeak[peak][0] = line*time_spacing;
-            fpeak[peak][1] = f_out[line];
+                fpeak[peak][0] = line * time_spacing;
+                fpeak[peak][1] = f_out[line];
             }
         }
     }
     
-    for(peak = 1; peak < PEAK_NUM+1; peak++){
+    for(int peak = 1; peak < PEAK_NUM+1; peak++){
         printf("Peak %i has frequency %lf and amplitude %lf\n", peak, fpeak[peak][0], fpeak[peak][1]);
     }
     
