@@ -3,5 +3,7 @@
 dir="ALCDEF_ALL"
 
 for f in "${dir}"/*.txt ; do
-	./metrics "${f}" "$(scripts/classify.sh ${f})" | tail -n 1
+	class=$(scripts/classify.sh "${f}")
+	[[ -z ${class} ]] && continue
+	./metrics "${f}" "${class}" | tail -n 1
 done
