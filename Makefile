@@ -12,6 +12,9 @@ neural: neural.cpp
 metrics: metrics.c
 	$(CC) $(CFLAGS) -o $@ $< -lfftw3
 
+inputdata:
+	scripts/run_metrics.sh > inputdata.txt
+
 .data: ALCDEF_ALL
 	scripts/squash_alcdef.sh
 	ruby scripts/select_alcdef.rb
